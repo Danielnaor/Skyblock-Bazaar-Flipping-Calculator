@@ -492,14 +492,35 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+function parseShorthandNumberSuffixes(str) {
+    // Parse a string with shorthand number suffixes (k, m, b) into a number.
+    // For example, "1.5k" becomes 1500, "2.3m" becomes 2300000, etc.
+
+    str = (str + '').trim().toLowerCase();
+    let multiplier = 1;
+    if (str.endsWith('k')) {
+        multiplier = 1e3;
+        str = str.slice(0, -1);
+    } else if (str.endsWith('m')) {
+        multiplier = 1e6;
+        str = str.slice(0, -1);
+    } else if (str.endsWith('b')) {
+        multiplier = 1e9;
+        str = str.slice(0, -1);
+    }
+    return Math.round(parseFloat(str.replace(/,/g, '')) * multiplier) || 0;
+}
+
+
 
 // Bind UI inputs to set internal values and update UI
 $('#maxOutlay').val(maxOutlay);
 $('#maxOutlay').keyup(function() {
-    maxOutlay = $( this ).val();
+    maxOutlay = parseShorthandNumberSuffixes($( this ).val());
     localStorage.setItem("maxOutlay", maxOutlay);
     updateDisplay();
 });
+
 $('input#useOfferLimit').prop('checked', useOfferLimit);
 $('input#useOfferLimit').on('change', function() {
     useOfferLimit = $('input#useOfferLimit').is(":checked");
